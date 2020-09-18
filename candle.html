@@ -1,0 +1,133 @@
+<html>
+  <head>
+    <style>
+      body {
+        background-color: rgb(24,10,2);
+        text-align:center;
+      }
+      #container {
+        margin:auto;
+        width:100%;
+        position:relative;
+        display:none;
+      }
+      #candle {
+        z-index: -1;
+        position:relative;
+        top:0;
+        margin-left:auto;
+        margin-right:auto;
+      }
+      #candle_body {
+        background-color:rgb(135,3,3);
+        width:108px;
+        height:3000px;
+        z-index: 1;
+        position:relative;
+        top:-222px;
+        margin-left:auto;
+        margin-right:auto;
+        left:-1px;
+      }
+      #timeleft {
+        position:fixed;
+        top:0;
+        left:0;
+        background:transparent;
+        color:white;
+        border-radius:5px;
+        margin:10px;
+        text-align:center;
+        height:50px;
+        font-size:25;
+      }
+      #start {
+        position:fixed;
+        top:54px;
+        left:0;
+        width:278px;
+        margin:10px;
+        height:50px;
+        font-size: 25;
+      }
+      #table {
+        width:100%;
+        position:fixed;
+        top:763px;
+        z-index:2;
+        height:1000px;
+        background-color: #C19A6B;
+      }
+      #holder {
+        position:relative;
+        top:-141px;
+        left:57px;
+        height:auto;
+        width:586px;
+        display:none;
+      }
+      #footer {
+        position:absolute;
+        bottom:0;
+        z-index: 4;
+        background-color: lightgray;
+        width:100%;
+        color:black;
+        text-align: center;
+      }
+    </style>
+    <script>
+      isLit = false;
+      burnCount = 0
+      function lightCandle(){
+        if (isLit){
+          clearInterval(burning)
+          document.getElementById("start").innerHTML = "Light"
+          isLit = false
+          document.getElementById("container").style.display = "none"
+          document.getElementById("holder").style.display = "none"
+        } else {
+          goal = document.getElementById("timeleft").value;
+          goal = goal.split(":")
+          hours = parseInt(goal[0]) * 60 * 60
+          minutes = parseInt(goal[1]) * 60
+          seconds = parseInt(goal[2])
+          goalSeconds = hours + minutes + seconds
+          //console.log("Going to burn for " + goalSeconds + " total seconds.")
+          burndown();
+          burning = setInterval(burndown, (goalSeconds/400*1000));
+          document.getElementById("start").innerHTML = "Extinguish"
+          document.getElementById("container").style.display = "initial";
+          document.getElementById("holder").style.display = "initial";
+          isLit = true
+        }
+      }
+      function burndown() {
+        timeLeftSeconds = goalSeconds - (goalSeconds/400*burnCount)
+        var candleContainer = document.getElementById("container");
+        candlePosition = window.getComputedStyle(candleContainer, null).getPropertyValue("top");
+        newPosition = parseInt(candlePosition.substring(0,candlePosition.length - 2));
+        candleContainer.style.top = (newPosition + 1) + "px";
+        //convert timeLeftSeconds to HH:MM:SS
+        displayTime = new Date(timeLeftSeconds * 1000).toISOString().substr(11,8)
+        document.getElementById("timeleft").value = displayTime
+        burnCount += 1
+        if (timeLeftSeconds <= 0){clearInterval(burning)}
+      }
+    </script>
+  </head>
+  <body>
+    <input placeholder="hh:mm:ss" id="timeleft" type="text" length=10 value="2:00:00"></input>
+    <button id="start" type="button" onclick="lightCandle()">Light</button>
+    <div id="container">
+      <img id="candle" src="candle.gif"/>
+      <div id="candle_body"></div>
+    </div>
+    <div id="table">
+      <img id="holder" src="candleholder.png" />
+    </div>
+    <div id="footer">
+      Conduct candle by Stuart Weenig. &copy;2020 All Rights Reserved
+    </div>
+  </body>
+</html>
